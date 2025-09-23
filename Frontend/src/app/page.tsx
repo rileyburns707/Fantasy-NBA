@@ -31,8 +31,9 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
         <p>Checking Supabase Connection...</p>
-        <p>Check the browser console (F12) for the results.</p>
+        <p>Check the browser console (opt. + command + I) for the results.</p>
       </div>
     </main>
   );
 }
+
