@@ -17,10 +17,10 @@ interface Player {
 }
 
 export default function HomePage() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState<Player[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState(''); // Stores the text currently typed into the search box.
+  const [searchResults, setSearchResults] = useState<Player[]>([]); // Stores the array of player objects returned by Supabase after a successful search.
+  const [isLoading, setIsLoading] = useState(false); // show a "Loading..." message while waiting for the network request to finish
+  const [error, setError] = useState<string | null>(null); // Stores any error message
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,6 +45,9 @@ export default function HomePage() {
         //   and selects ONLY the 'name' column from the associated 'teams' table.
         .select('id, full_name, position, team_id!inner(name)') 
         // QUERY: Search on the correct column 'full_name'
+        // - This compares the full_name column to the search term. 
+        //   The % symbols are wildcards, meaning it will find results where the 
+        //   search term appears anywhere in the name. i means case-insensitive.
         .ilike('full_name', `%${queryTerm}%`) 
         .limit(20);
 
