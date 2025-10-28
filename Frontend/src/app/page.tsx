@@ -22,6 +22,7 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false); // show a "Loading..." message while waiting for the network request to finish
   const [error, setError] = useState<string | null>(null); // Stores any error message
 
+  // search logic
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     const queryTerm = searchTerm.trim();
@@ -36,6 +37,8 @@ export default function HomePage() {
     setError(null);
     setSearchResults([]);
 
+
+    // supabase query
     try {
       const { data, error } = await supabase
         .from('players')
@@ -58,9 +61,9 @@ export default function HomePage() {
         return;
       }
       
-      // FIX FOR RED UNDERLINE: Explicitly map and cast to satisfy TypeScript's strict type checking
+      // Explicitly map and cast to satisfy TypeScript's strict type checking
       if (data) {
-        // We cast to 'as any[]' temporarily to bypass the complex nested type issue 
+        // Cast to 'as any[]' temporarily to bypass the complex nested type issue 
         // with Supabase joins, and then cast to the correct Player[] type structure.
         const typedData = (data as any[]).map(item => ({
             id: item.id,

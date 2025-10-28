@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';  // hook that pulls data from supabase
 import { supabase } from '@/lib/supabaseClient';    // sets up connection to supabase
 
+// defining player structure
 interface Player {
   id: number;
   full_name: string;
@@ -25,7 +26,7 @@ export default function SearchPage() {
       const queryTerm = searchTerm.trim();
       
       if (queryTerm.length < 2) {
-        setError("PLease enter at least 2 letters to search")
+        setError("Please enter at least 2 letters to search")
         setSearchResults([])
         return;
       }
@@ -75,8 +76,8 @@ export default function SearchPage() {
 return (
    <main className="flex flex-col items-center justify-start min-h-screen bg-[#0693e3] text-white p-6">
     
-    {/* Search Message*/}
-    <h1 className="text-6xl front-extrabold mb-8 text-red">
+    {/* Header Search Message*/}
+    <h1 className="text-6xl front-extrabold mb-8 text-white">
       Player Search
     </h1>
 
@@ -92,7 +93,7 @@ return (
         />
         <button
           type="submit"
-          className="p-4 bg-red-500 hover:bg-red-600 text-white font-bold transition duration-150"
+          className="flex items-center justify-center h-full text-lg p-4 bg-red-500 hover:bg-red-600 text-white font-bold transition duration-150"
           disabled={isLoading}
         >
           {isLoading ? 'Searching...' : 'Search'}
@@ -101,14 +102,34 @@ return (
     </form>
 
     {/*Search result options*/}
-    <div>
+    <div className="mt-12 w-full max-w-xl">
       {/* error */}
+      {error && ( 
+        <p className="text-center text-gray-700">{error}</p>
+      )}
+
       {/* Loading */}
+      {isLoading && (
+        <p className="text-center text-gray-700">Loading player data from database...</p>
+      )}
+
       {/* No results */}
-      {/* list of players */}
+      {!isLoading && !error && searchResults.length === 0 && searchTerm.length > 0 &&(
+        <p className="text-center text-gray-700">No players found matching "{searchTerm}".</p>
+      )}
+
+      {/* show list of players matching the search*/}
+      {!isLoading && searchResults.length > 0 && (
+        <ul className="space-y-3">
+          {searchResults.map((player) => (
+            <li key={player.id} className="flex justify-between items-center bg-gray-300 p-4 rounded-lg shadow-md border-3 border-red-500">
+              <span className="text-xl font-medium text-black">{player.full_name}</span>
+              <span className="text-sm text-black">{player.position} | {player.team_id?.name || 'N/A'}</span>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
-
-
    </main>
  );
 }
