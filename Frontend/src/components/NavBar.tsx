@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 // array of links
 const Links = [
@@ -13,7 +14,15 @@ const Links = [
 // nav bar components
 const NavBar = () => {
   return (
-    <nav className="flex justify-center bg-gray-800 p-8">
+    <nav className="flex justify-center bg-gray-800 p-6">
+      <div className='absolute top-5 left-5'>
+              <Image
+                src='/nba-logo.png'
+                alt='navbar NBA Logo'
+                width={80}
+                height={20}
+              />
+            </div>
       <div className="flex justify-center sm:justify-between items-center mx-auto max-w-6xl gap-6">
         <Link
           href="/"
