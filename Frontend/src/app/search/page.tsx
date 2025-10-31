@@ -1,6 +1,6 @@
-'use client';   // client side 
+'use client';   
 
-import { useEffect, useState } from 'react';  // hook that pulls data from supabase
+import { useState } from 'react';  // hook that pulls data from supabase
 import { supabase } from '@/lib/supabaseClient';    // sets up connection to supabase
 
 // defining player structure
@@ -8,9 +8,7 @@ interface Player {
   id: number;
   full_name: string;
   position: string;
-  team_id: {
-    name: string;
-  } | null;
+  team_id: { name: string } | null;
 }
 
 export default function SearchPage() {
