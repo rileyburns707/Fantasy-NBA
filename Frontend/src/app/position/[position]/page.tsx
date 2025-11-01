@@ -14,26 +14,24 @@ interface Player {
 export default function PositionPage() {
   const { position } = useParams(); 
   const positionParam = Array.isArray(position) ? position[0] : position || '';
-  
-  const [players, setPlayers] = useState<Player[]>([]);
-  const [search, setSearch ] = useState('');
-  const [page, setPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const PAGE_SIZE = 20
-
-  // Map from URL segment to database value
+  const normalizedPosition = positionParam.toLowerCase();
+  // mapping object because URL segment will be a word, like "guards", but database only stores "G" and "G-F"
   const positionMap: Record<string, string[]> = {
     'guards': ['G', 'G-F'],
     'forwards': ['F', 'F-C', 'G-F'],
     'centers': ['C', 'F-C'],
   };
-
-// Normalize positionParam to lowercase
-const normalizedPosition = positionParam.toLowerCase();
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [search, setSearch ] = useState('');
+  const [page, setPage] = useState(1);
+  const [hasMorePages, setHasMorePages] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const PAGE_SIZE = 15
 
   useEffect(() => {
     if (!normalizedPosition) return;
+    
     const fetchPlayers = async () => {
       setIsLoading(true);
       setError(null);
@@ -43,8 +41,8 @@ const normalizedPosition = positionParam.toLowerCase();
           .from('players')
           .select('id, full_name, position, team_id!inner(name)')
           .in('position', positionMap[normalizedPosition] || []);
-
-        // only filter if user typed something
+        
+        // search bar
         if (search.trim()) {
           query = query.ilike('full_name', `%${search.trim()}%`);
         }
@@ -62,6 +60,9 @@ const normalizedPosition = positionParam.toLowerCase();
         }
 
         if (data) {
+          const isLastPage = data.length < PAGE_SIZE; 
+          setHasMorePages(!isLastPage);
+
           const inputData = (data as any[]).map(item => ({
             id: item.id,
             full_name: item.full_name,
@@ -71,6 +72,7 @@ const normalizedPosition = positionParam.toLowerCase();
           setPlayers(inputData);
         } else {
           setPlayers([]);
+          setHasMorePages(false);
         }
 
       } catch (err) {
@@ -99,7 +101,7 @@ const normalizedPosition = positionParam.toLowerCase();
       <div className="w-full max-w-4xl mb-6 border border-white rounded-lg">
         <input
           type="text"
-          placeholder="Search players on this page (e.g., LeBron James)"
+          placeholder="Search players in this position (e.g., LeBron James)"
           value={search}
           onChange={(e) => {
             setSearch(e.target.value)
@@ -120,7 +122,7 @@ const normalizedPosition = positionParam.toLowerCase();
         <table className="min-w-full bg-white text-[#0693e3] rounded-lg overflow-hidden">
           <thead>
             <tr className="bg-[#0580c3] text-white">
-              <th className="py-3 px-4 text-left">Player Full Name</th>
+              <th className="py-3 px-8 text-left">Player Full Name</th>
               <th className="py-3 px-4 text-left">Team</th>
               <th className="py-3 px-4 text-left">Position</th>
             </tr>
@@ -132,7 +134,7 @@ const normalizedPosition = positionParam.toLowerCase();
                   key={player.id}
                   className="border-b border-gray-200 hover:bg-[#e6f7ff] cursor-pointer"
                   onClick={() => {
-                    // Placeholder - later: open modal with detailed stats
+                    // Placeholder. Later I will have a pop up with player stats
                     console.log('Clicked player id:', player.id);
                   }}
                 >
@@ -163,7 +165,8 @@ const normalizedPosition = positionParam.toLowerCase();
         </button>
         <button
           onClick={() => setPage(p => p + 1)}
-          className="bg-white text-[#0693e3] px-4 py-2 rounded-md font-semibold"
+          disabled={!hasMorePages}
+          className="bg-white text-[#0693e3] px-4 py-2 rounded-md font-semibold disabled:opacity-50"
         >
           Next
         </button>
