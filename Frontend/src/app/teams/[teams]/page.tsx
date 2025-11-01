@@ -11,15 +11,41 @@ interface Player {
   team_id: { name: string } | null;
 }
 
-export default function PositionPage() {
-  const { position } = useParams(); 
-  const positionParam = Array.isArray(position) ? position[0] : position || '';
-  const normalizedPosition = positionParam.toLowerCase();
-  // mapping object because URL segment will be a word, like "guards", but database only stores "G" and "G-F"
-  const positionMap: Record<string, string[]> = {
-    'guards': ['G', 'G-F'],
-    'forwards': ['F', 'F-C', 'G-F'],
-    'centers': ['C', 'F-C'],
+export default function TeamsPlayerPage() {
+  const { teams } = useParams(); 
+  const teamParam = Array.isArray(teams) ? teams[0] : teams || '';  // do I need this if team is declared an array in DivisionGroupProps
+  const normalizedTeam = teamParam.toLowerCase();
+  const teamMap: Record<string, string> = {
+    'celtics': 'BOS',
+    'nets': 'BKN',
+    'knicks': 'NYK',
+    '76ers': 'PHI',
+    'raptors': 'TOR',
+    'bulls': 'CHI',
+    'cavaliers': 'CLE',
+    'pistons': 'DET',
+    'pacers': 'IND',
+    'bucks': 'MIL',
+    'hawks': 'ATL',
+    'hornets': 'CHA',
+    'heat': 'MIA',
+    'magic': 'ORL',
+    'wizards': 'WAS',
+    'nuggets': 'DEN',
+    'timberwolves': 'MIN',
+    'thunder': 'OKC',
+    'blazers': 'POR',
+    'jazz': 'UTA',
+    'warriors': 'GSW',
+    'clippers': 'LAC',
+    'lakers': 'LAL',
+    'suns': 'PHX',
+    'kings': 'SAC',
+    'mavericks': 'DAL',
+    'rockets': 'HOU',
+    'grizzlies': 'MEM',
+    'pelicans': 'NOP',
+    'spurs': 'SAS',
   };
   const [players, setPlayers] = useState<Player[]>([]);
   const [search, setSearch ] = useState('');
@@ -27,11 +53,11 @@ export default function PositionPage() {
   const [hasMorePages, setHasMorePages] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const PAGE_SIZE = 15
+  const PAGE_SIZE = 10
 
   useEffect(() => {
-    if (!normalizedPosition) return;
-    
+    if (!normalizedTeam) return;
+
     const fetchPlayers = async () => {
       setIsLoading(true);
       setError(null);
@@ -40,18 +66,16 @@ export default function PositionPage() {
         let query = supabase
           .from('players')
           .select('id, full_name, position, team_id!inner(name)')
-          .in('position', positionMap[normalizedPosition] || []);
-        
-        // search bar
+          .eq('team_id.name', teamMap[normalizedTeam]);
+
         if (search.trim()) {
           query = query.ilike('full_name', `%${search.trim()}%`);
         }
 
-        // pagination
         const from = (page - 1) * PAGE_SIZE;
-        const to = page * PAGE_SIZE - 1;
+        const to = page * PAGE_SIZE - 1
 
-        const { data, error: dbError } = await query.range(from, to);
+        const { data, error: dbError} = await query.range(from, to);
 
         if (dbError) {
           console.error('Supabase fetch error: ', dbError);
@@ -60,7 +84,7 @@ export default function PositionPage() {
         }
 
         if (data) {
-          const isLastPage = data.length < PAGE_SIZE; 
+          const isLastPage = data.length < PAGE_SIZE;
           setHasMorePages(!isLastPage);
 
           const inputData = (data as any[]).map(item => ({
@@ -83,25 +107,22 @@ export default function PositionPage() {
         setIsLoading(false);
       }
     };
-    if (positionParam) fetchPlayers();
-  }, [positionParam, page, search]);
-
+    if (teamParam) fetchPlayers();
+  }, [teamParam, page, search]);
 
   return (
     <main className="flex flex-col items-center min-h-screen bg-[#0693e3] text-white p-6">
-      {/* Top-left position title */}
+      {/* Team name and page number*/}
       <div className="mb-4 w-full max-w-4xl flex items-center justify-between">
-        <h1 className="text-3xl font-bold">{positionParam.replace('-', ' ').toUpperCase()}</h1>
-
-        {/* Page indicator */}
+        <h1 className="text-3xl font-bold">{teamParam.toUpperCase()}</h1>
         <div className="text-sm">Page {page}</div>
       </div>
 
-      {/* Search input */}
+      {/* Search bar */}
       <div className="w-full max-w-4xl mb-6 border border-white rounded-lg">
-        <input
+        <input 
           type="text"
-          placeholder="Search players in this position (e.g., LeBron James)"
+          placeholder="Search player on this team (e.g,, Lebron James"
           value={search}
           onChange={(e) => {
             setSearch(e.target.value)
@@ -110,13 +131,13 @@ export default function PositionPage() {
           className="w-full p-3 rounded-md text-black"
         />
       </div>
-
+      
       {/* Error / Loading */}
       <div className="w-full max-w-4xl">
         {error && <p className="mb-4 text-red-200">Error: {error}</p>}
         {isLoading && <p className="mb-4 text-white/90">Loading players...</p>}
       </div>
-
+      
       {/* Table */}
       <div className="w-full max-w-4xl overflow-x-auto">
         <table className="min-w-full bg-white text-[#0693e3] rounded-lg overflow-hidden">
@@ -171,6 +192,7 @@ export default function PositionPage() {
           Next
         </button>
       </div>
+
     </main>
   );
 }
