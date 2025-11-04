@@ -13,7 +13,7 @@ interface Player {
 
 export default function TeamsPlayerPage() {
   const { teams } = useParams(); 
-  const teamParam = Array.isArray(teams) ? teams[0] : teams || '';  // do I need this if team is declared an array in DivisionGroupProps
+  const teamParam = Array.isArray(teams) ? teams[0] : teams || '';  
   const normalizedTeam = teamParam.toLowerCase();
   const teamMap: Record<string, string> = {
     'celtics': 'BOS',
@@ -122,7 +122,7 @@ export default function TeamsPlayerPage() {
       <div className="w-full max-w-4xl mb-6 border border-white rounded-lg">
         <input 
           type="text"
-          placeholder="Search player on this team (e.g,, Lebron James"
+          placeholder="Search player on this team (e.g., Lebron James)"
           value={search}
           onChange={(e) => {
             setSearch(e.target.value)

@@ -73,25 +73,24 @@ export default function SearchPage() {
 // UI/UX design using JSX
 return (
    <main className="flex flex-col items-center justify-start min-h-screen bg-[#0693e3] text-white p-6">
-    
     {/* Header Search Message*/}
-    <h1 className="text-6xl front-extrabold mb-8 text-white">
-      Player Search
-    </h1>
+    <div className="mb-4 w-full max-w-4xl flex items-center justify-between">
+      <h1 className="text-3xl font-bold">Player Search</h1>
+    </div>
 
     {/* Search bar*/}
-    <form onSubmit={searchPlayers} className="w-full max-w-xl">
-      <div className="flex items-center border border-white rounded-lg overflow-hidden focus-within:border-red-500 transition duration-150">
+    <form onSubmit={searchPlayers} className="w-full max-w-4xl">
+      <div className="flex items-center mb-6 border border-white rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-800">
         <input
           type="text"
           placeholder="Search players (e.g., Lebron James)..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full p-4 text-lg bg-gray-800 text-white placeholder-gray-400 focus:outline-none"
+          className="w-full p-3 focus:outline-none text-black"
         />
         <button
           type="submit"
-          className="flex items-center justify-center h-full text-lg p-4 bg-red-500 hover:bg-red-600 text-white font-bold transition duration-150"
+          className="flex items-center justify-center flex-shrink-0 text-lg p-3 bg-red-500 hover:bg-red-600 text-white font-bold transition duration-150 focus:outline-none focus:ring-2 focus:ring-blue-800"
           disabled={isLoading}
         >
           {isLoading ? 'Searching...' : 'Search'}
@@ -99,35 +98,49 @@ return (
       </div>
     </form>
 
-    {/*Search result options*/}
-    <div className="mt-12 w-full max-w-xl">
-      {/* error */}
-      {error && ( 
-        <p className="text-center text-gray-700">{error}</p>
-      )}
-
-      {/* Loading */}
-      {isLoading && (
-        <p className="text-center text-gray-700">Loading player data from database...</p>
-      )}
-
-      {/* No results */}
-      {!isLoading && !error && searchResults.length === 0 && searchTerm.length > 0 &&(
-        <p className="text-center text-gray-700">No players found matching "{searchTerm}".</p>
-      )}
-
-      {/* show list of players matching the search*/}
-      {!isLoading && searchResults.length > 0 && (
-        <ul className="space-y-3">
-          {searchResults.map((player) => (
-            <li key={player.id} className="flex justify-between items-center bg-gray-300 p-4 rounded-lg shadow-md border-3 border-red-500">
-              <span className="text-xl font-medium text-black">{player.full_name}</span>
-              <span className="text-sm text-black">{player.position} | {player.team_id?.name || 'N/A'}</span>
-            </li>
-          ))}
-        </ul>
-      )}
+    {/* Error / Loading */}
+    <div className="w-full max-w-4xl">
+      {error && <p className="mb-4 text-red-200">Error: {error}</p>}
+      {isLoading && <p className="mb-4 text-white/90">Loading players...</p>}
     </div>
+
+    {/* Table */}
+    <div className="w-full max-w-4xl overflow-x-auto">
+        <table className="min-w-full bg-white text-[#0693e3] rounded-lg overflow-hidden">
+          <thead>
+            <tr className="bg-[#0580c3] text-white">
+              <th className="py-3 px-8 text-left">Player Name</th>
+              <th className="py-3 px-4 text-left">Team</th>
+              <th className="py-3 px-4 text-left">Position</th>
+            </tr>
+          </thead>
+          <tbody>
+            {searchResults.length > 0 ? (
+              searchResults.map(searchResults => (
+                <tr
+                  key={searchResults.id}
+                  className="border-b border-gray-200 hover:bg-[#e6f7ff] cursor-pointer"
+                  onClick={() => {
+                    // Placeholder. Later I will have a pop up with player stats
+                    console.log('Clicked player id:', searchResults.id);
+                  }}
+                >
+                  <td className="py-2 px-4 text-black">{searchResults.full_name}</td>
+                  <td className="py-2 px-4 text-black">{searchResults.team_id?.name ?? 'N/A'}</td>
+                  <td className="py-2 px-4 text-black">{searchResults.position}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={3} className="py-4 text-center text-black">
+                  {isLoading ? 'Loading...' : 'No players found on this page'}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
    </main>
  );
 }
