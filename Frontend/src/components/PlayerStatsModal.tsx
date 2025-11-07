@@ -1,6 +1,6 @@
 import React from 'react'
 
-interface PlayerStats {
+export interface PlayerStats {
   // header details
   full_name: string;
   position: string;
@@ -14,7 +14,7 @@ interface PlayerStats {
   free_through_percentage: number;
   total_rebounds: number;
   assists: number;
-  steaks: number;
+  steals: number;
   blocks: number;
   turnovers: number;
   points: number;
@@ -92,7 +92,7 @@ export default function PlayerStatsModal({isOpen, onClose, details, isLoading} :
                   <StatItem label="Points" value={details.points} />
                   <StatItem label="Assists" value={details.assists} />
                   <StatItem label="Rebounds" value={details.total_rebounds} />
-                  <StatItem label="Steals" value={details.steaks} />
+                  <StatItem label="Steals" value={details.steals} />
                   <StatItem label="Blocks" value={details.blocks} />
                   <StatItem label="Turnovers" value={details.turnovers} />
                   <StatItem label="Fantasy Pts" value={details.fantasy_points_standard} />
