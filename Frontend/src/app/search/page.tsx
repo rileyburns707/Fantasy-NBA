@@ -1,9 +1,9 @@
 'use client';   
 
-import { useState } from 'react';  // hook that pulls data from supabase
-import { supabase } from '@/lib/supabaseClient';    // sets up connection to supabase
+import { useState } from 'react'; 
+import { supabase } from '@/lib/supabaseClient'; 
+import PlayerStatsModal, {PlayerStats} from '@/components/PlayerStatsModal';
 
-// defining player structure
 interface Player {
   id: number;
   full_name: string;
@@ -12,13 +12,15 @@ interface Player {
 }
 
 export default function SearchPage() {
-    // state declarations
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState<Player[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // core logic (query building and fetching)
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalDetails, setModalDetails]= useState<PlayerStats | null>(null);
+    const [isModalLoading, setIsModalLoading] = useState(false);
+
     const searchPlayers = async (e: React.FormEvent) => {
       e.preventDefault();
       const queryTerm = searchTerm.trim();
@@ -29,27 +31,23 @@ export default function SearchPage() {
         return;
       }
 
-      // set loading state
       setIsLoading(true);
       setError(null);
       setSearchResults([]);
 
       try {
-        // Search supabase
         const { data, error } = await supabase
         .from('players')
         .select('id, full_name, position, team_id!inner(name)')
         .ilike('full_name', `%${queryTerm}%`)
         .limit(5);
 
-        // handle errors
         if (error) {
           console.error('Supabase search error: ', error);
           setError(`Failed to fetch players. Error: ${error.message}`);
           return;
         }
 
-        // set results
         if (data) {
           const inputData = (data as any[]).map(item => ({
             id: item.id,
@@ -70,7 +68,52 @@ export default function SearchPage() {
       }
     };
 
-// UI/UX design using JSX
+    const fetchAndOpenModal = async (player: Player) => {
+      setIsModalOpen(true); 
+      setModalDetails(null); 
+      setIsModalLoading(true);
+
+      try {
+        const { data, error: dbError } = await supabase
+          .from('player_season_stats')
+          .select('*, team_name:teams!inner(name)')
+          .eq('player_id', player.id)
+          .single();
+
+        if (dbError) {
+          console.error('Error fetching player stats:', dbError);
+          setModalDetails(null);
+        } 
+        
+        if (data) {
+          const stats: PlayerStats = {
+            full_name: player.full_name,
+            position: player.position,
+            team_name: data.team_name.name || 'N/A', 
+            games_played: data.games_played,
+            total_minutes: data.total_minutes,
+            field_goal_percentage: data.field_goal_percentage,
+            three_point_percentage: data.three_point_percentage,
+            free_through_percentage: data.free_through_percentage,
+            total_rebounds: data.total_rebounds,
+            assists: data.assists,
+            steals: data.steaks, 
+            blocks: data.blocks,
+            turnovers: data.turnovers,
+            points: data.points,
+            fantasy_points_standard: data.fantasy_points_standard,
+            plus_minus: data.plus_minus,
+          };
+          setModalDetails(stats);
+        }
+      } catch (err) {
+        console.error('Unexpected error fetching stats:', err)
+        setModalDetails(null);
+      } finally {
+        setIsModalLoading(false);
+      }
+    };
+
 return (
    <main className="flex flex-col items-center justify-start min-h-screen bg-[#0693e3] text-white p-6">
     {/* Header Search Message*/}
@@ -121,8 +164,7 @@ return (
                   key={searchResults.id}
                   className="border-b border-gray-200 hover:bg-[#e6f7ff] cursor-pointer"
                   onClick={() => {
-                    // Placeholder. Later I will have a pop up with player stats
-                    console.log('Clicked player id:', searchResults.id);
+                    fetchAndOpenModal(searchResults);
                   }}
                 >
                   <td className="py-2 px-4 text-black">{searchResults.full_name}</td>
@@ -141,6 +183,13 @@ return (
         </table>
       </div>
 
+      {/* Player stats modal */}
+      <PlayerStatsModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        details={modalDetails}
+        isLoading={isModalLoading}
+      />
    </main>
  );
 }

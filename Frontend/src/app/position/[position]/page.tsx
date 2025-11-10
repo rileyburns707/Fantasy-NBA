@@ -30,7 +30,6 @@ export default function PositionPage() {
   const [error, setError] = useState<string | null>(null);
   const PAGE_SIZE = 15
 
-  // Modal State Variables
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalDetails, setModalDetails] = useState<PlayerStats | null>(null);
   const [isModalLoading, setIsModalLoading] = useState(false);
@@ -92,7 +91,6 @@ export default function PositionPage() {
     if (positionParam) fetchPlayers();
   }, [positionParam, page, search]);
 
-  // ... after the useEffect hook and before the return statement
   const fetchAndOpenModal = async (player: Player) => {
     setIsModalOpen(true); 
     setModalDetails(null); 
@@ -101,22 +99,20 @@ export default function PositionPage() {
     try {
       const { data, error: dbError } = await supabase
         .from('player_season_stats') 
-        .select(`
-          *,
-          team_name:teams!inner(name)
-        `) // Select all stats and the team name via foreign key
-        .eq('player_id', player.id) // Match the stats by the player's ID
+        .select(`*, team_name:teams!inner(name)`)
+        .eq('player_id', player.id)
         .single(); // Expect a single row
 
       if (dbError) {
         console.error('Error fetching player stats:', dbError);
         setModalDetails(null);
-      } else if (data) {
-        // 2. Map the data to the PlayerStats interface
+      } 
+      
+      if (data) {
         const stats: PlayerStats = {
           full_name: player.full_name,
           position: player.position,
-          team_name: data.team_name.name || 'N/A', // Assuming team_name comes from a join
+          team_name: data.team_name.name || 'N/A', 
           games_played: data.games_played,
           total_minutes: data.total_minutes,
           field_goal_percentage: data.field_goal_percentage,
@@ -133,7 +129,6 @@ export default function PositionPage() {
         };
         setModalDetails(stats);
       }
-
     } catch (err) {
       console.error('Unexpected error fetching stats:', err);
       setModalDetails(null);
@@ -141,7 +136,6 @@ export default function PositionPage() {
       setIsModalLoading(false); 
     }
   };
-
 
   return (
     <main className="flex flex-col items-center min-h-screen bg-[#0693e3] text-white p-6">
@@ -190,7 +184,6 @@ export default function PositionPage() {
                   key={player.id}
                   className="border-b border-gray-200 hover:bg-[#e6f7ff] cursor-pointer"
                   onClick={() => {
-                    // Placeholder. Later I will have a pop up with player stats
                     fetchAndOpenModal(player);
                   }}
                 >
@@ -228,7 +221,7 @@ export default function PositionPage() {
         </button>
       </div>
 
-      {/* Open player stats modal */}
+      {/* Player stats modal */}
       <PlayerStatsModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
