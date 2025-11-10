@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { supabase } from '@/lib/supabaseClient';
+import PlayerStatsModal, {PlayerStats} from "@/components/PlayerStatsModal";
 
 interface Player {
   id: number;
@@ -15,6 +16,7 @@ export default function TeamsPlayerPage() {
   const { teams } = useParams(); 
   const teamParam = Array.isArray(teams) ? teams[0] : teams || '';  
   const normalizedTeam = teamParam.toLowerCase();
+  // the database stores teams in this format 'BOS', 'BKN', etc.
   const teamMap: Record<string, string> = {
     'celtics': 'BOS',
     'nets': 'BKN',
@@ -54,6 +56,10 @@ export default function TeamsPlayerPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const PAGE_SIZE = 10
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalDetails, setModalDetails] = useState<PlayerStats | null>(null);
+  const [isModalLoading, setIsModalLoading] = useState(false);
 
   useEffect(() => {
     if (!normalizedTeam) return;
@@ -110,6 +116,52 @@ export default function TeamsPlayerPage() {
     if (teamParam) fetchPlayers();
   }, [teamParam, page, search]);
 
+  const fetchAndOpenModal = async (player: Player) => {
+    setIsModalOpen(true);
+    setModalDetails(null);
+    setIsModalLoading(true);
+
+    try {
+      const { data, error: dbError} = await supabase
+        .from('player_season_stats')
+        .select('*, team_name:teams!inner(name)')
+        .eq('player_id', player.id)
+        .single();
+
+      if (dbError) {
+        console.error('Error fetching player stats:', dbError)
+        setModalDetails(null);
+      }
+
+      if (data) {
+        const stats: PlayerStats = {
+          full_name: player.full_name,
+          position: player.position,
+          team_name: data.team_name.name || 'N/A', 
+          games_played: data.games_played,
+          total_minutes: data.total_minutes,
+          field_goal_percentage: data.field_goal_percentage,
+          three_point_percentage: data.three_point_percentage,
+          free_through_percentage: data.free_through_percentage,
+          total_rebounds: data.total_rebounds,
+          assists: data.assists,
+          steals: data.steaks, 
+          blocks: data.blocks,
+          turnovers: data.turnovers,
+          points: data.points,
+          fantasy_points_standard: data.fantasy_points_standard,
+          plus_minus: data.plus_minus,
+        };
+        setModalDetails(stats)
+      }
+    } catch (err) {
+      console.error('Unexpected error fetching stats:', err);
+      setModalDetails(null);
+    } finally {
+      setIsModalLoading(false);
+    }
+  };
+
   return (
     <main className="flex flex-col items-center min-h-screen bg-[#0693e3] text-white p-6">
       {/* Team name and page number*/}
@@ -155,8 +207,7 @@ export default function TeamsPlayerPage() {
                   key={player.id}
                   className="border-b border-gray-200 hover:bg-[#e6f7ff] cursor-pointer"
                   onClick={() => {
-                    // Placeholder. Later I will have a pop up with player stats
-                    console.log('Clicked player id:', player.id);
+                    fetchAndOpenModal(player)
                   }}
                 >
                   <td className="py-2 px-4 text-black">{player.full_name}</td>
@@ -193,6 +244,12 @@ export default function TeamsPlayerPage() {
         </button>
       </div>
 
+      <PlayerStatsModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        details={modalDetails}
+        isLoading={isModalLoading}
+      />
     </main>
   );
 }
