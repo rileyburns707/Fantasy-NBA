@@ -14,7 +14,7 @@ const Links = [
 // nav bar components
 const NavBar = () => {
   return (
-    <nav className="flex justify-center bg-gray-800 p-6">
+    <nav className="flex justify-center bg-black p-6">
       <div className='absolute top-5 left-5'>
               <Image
                 src='/nba-logo.png'

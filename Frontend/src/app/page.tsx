@@ -5,12 +5,12 @@ import Image from 'next/image';
 
 export default function HomePage() {
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen bg-[#0693e3] text-white p-6 ">
-      <div className='absolute top-30 left-10'>
+    <main className="flex flex-col items-center justify-center min-h-screen bg-black text-white p-6">
+      <div className='absolute top-90 left-50'>
         <Image
-          src='/nba-logo.png'
+          src='/fantasy-NBA-logo.png'
           alt='NBA Logo'
-          width={400}
+          width={300}
           height={100}
         />
       </div>
