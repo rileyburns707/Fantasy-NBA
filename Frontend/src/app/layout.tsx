@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Roboto } from "next/font/google";
 import "./globals.css";
 import NavBar from "@/components/NavBar";
 
@@ -13,8 +13,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const roboto = Roboto({
+  variable: "--font-roboto",
+  subsets: ["latin"],
+})
+
 export const metadata: Metadata = {
-  title: "Fantasy NBA App",
+  title: "Fantasy NBA",
   description: "Website to view NBA fantasy stats",
 };
 
@@ -25,7 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased` }>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${roboto.variable} antialiased` }>
         <NavBar />
         <main>
           {children}

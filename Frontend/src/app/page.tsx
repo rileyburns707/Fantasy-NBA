@@ -5,7 +5,7 @@ import Image from 'next/image';
 
 export default function HomePage() {
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen bg-[#0693e3] text-white p-6">
+    <main className="flex flex-col items-center justify-center min-h-screen bg-[#0693e3] text-white p-6 ">
       <div className='absolute top-30 left-10'>
         <Image
           src='/nba-logo.png'

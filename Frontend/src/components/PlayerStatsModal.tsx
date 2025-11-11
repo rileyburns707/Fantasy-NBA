@@ -11,7 +11,7 @@ export interface PlayerStats {
   total_minutes: number;
   field_goal_percentage: number;
   three_point_percentage: number;
-  free_through_percentage: number;
+  free_throw_percentage: number;
   total_rebounds: number;
   assists: number;
   steals: number;
@@ -28,7 +28,7 @@ const StatItem = ({label, value}: {label: string, value: number | string | undef
     {/* Handle percentages and general numbers */}
     <div className="text-xl md:text-2xl font-extrabold text-gray-900 mt-1">
       {typeof value === 'number' 
-        ? (value < 1 ? (value * 100).toFixed(1) + '%' : value.toFixed(1))
+        ? (Math.abs(value) < 1 ? (value * 100).toFixed(1) + '%' : value.toFixed(1))
         : (value ?? 'N/A')}
     </div>
   </div>
@@ -105,7 +105,7 @@ export default function PlayerStatsModal({isOpen, onClose, details, isLoading} :
                 <div className="grid grid-cols-3 gap-4">
                   <StatItem label="FG%" value={details.field_goal_percentage} />
                   <StatItem label="3PT%" value={details.three_point_percentage} />
-                  <StatItem label="FT%" value={details.free_through_percentage} />
+                  <StatItem label="FT%" value={details.free_throw_percentage} />
                 </div>
 
               </div>
