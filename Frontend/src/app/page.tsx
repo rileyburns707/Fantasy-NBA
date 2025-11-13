@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useState } from 'react'; 
 
-// Define the title text
 const titleText = "Welcome to Fantasy NBA";
 
 // Split the title into an array of <span> elements
@@ -11,7 +11,8 @@ const animatedTitle = titleText.split('').map((letter, index) => (
   <span 
     key={index} 
     // Apply a subtle transition, the hover color change, and inline-block for better spacing
-    className="transition duration-100 hover:text-[#0693e3] inline-block"
+    className="transition duration-100 hover:text-[#0693e3] inline-block animate-text-load-in hover:animate-letter-jump-hover-config"
+    style={{ animationDelay: `${0.01 * index}s`}}
   >
     {/* Use non-breaking space for actual spaces in the text */}
     {letter === ' ' ? '\u00A0' : letter} 
@@ -29,7 +30,7 @@ export default function HomePage() {
           height={100}
         />
       </div>
-      <h1 className="text-6xl font-extrabold tracking-wider mb-6 animate-text-fix">
+      <h1 className="text-6xl font-extrabold tracking-wider mb-6">
         {animatedTitle}
       </h1>
       <Link
