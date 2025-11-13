@@ -4,36 +4,34 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
-// array of links
 const Links = [
-  {href:"/search", text:"search"},
-  {href:"/position", text:"position"},
-  {href:"/teams", text:"teams"},
+  {href:"/search", text:"Search"},
+  {href:"/position", text:"Position"},
+  {href:"/teams", text:"Teams"},
 ];
 
-// nav bar components
 const NavBar = () => {
   return (
-    <nav className="flex justify-center bg-black p-6">
-      <div className='absolute top-5 left-5'>
+    <nav className="flex justify-center bg-black p-9">
+      <div className='absolute top-2 left-10'>
               <Image
-                src='/nba-logo.png'
+                src='/fantasy-NBA-logo-black.png'
                 alt='navbar NBA Logo'
-                width={80}
-                height={20}
+                width={120}
+                height={80}
               />
             </div>
-      <div className="flex justify-center sm:justify-between items-center mx-auto max-w-6xl gap-6">
+      <div className="flex justify-center sm:justify-between items-center mx-auto max-w-6xl gap-75">
         <Link
           href="/"
-          className="text-3xl text-white font-bold hover:text-red-600 transition duration-150"
+          className="text-xl text-white font-bold hover:[#0693e3] transition duration-150"
         >
           Home
         </Link>
-        <ul className="flex gap-6">
+        <ul className="flex gap-75">
           { Links.map((link) => (
               <li key={link.href}>
-                <Link href={link.href} className="capitalize">
+                <Link href={link.href} className="text-xl text-white font-bold hover:text-[#0693e3] transition duration-150">
                   {link.text}
                 </Link>
               </li>
