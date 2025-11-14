@@ -14,17 +14,21 @@ const NavBar = () => {
   return (
     <nav className="flex justify-center bg-black p-9">
       <div className='absolute top-2 left-10'>
+        <Link
+          href="/"
+        >
               <Image
                 src='/fantasy-NBA-logo-black.png'
                 alt='navbar NBA Logo'
                 width={120}
                 height={80}
               />
-            </div>
+        </Link>
+      </div>
       <div className="flex justify-center sm:justify-between items-center mx-auto max-w-6xl gap-75">
         <Link
           href="/"
-          className="text-xl text-white font-bold hover:[#0693e3] transition duration-150"
+          className="text-xl text-white font-bold hover:text-[#0693e3] transition duration-150"
         >
           Home
         </Link>
