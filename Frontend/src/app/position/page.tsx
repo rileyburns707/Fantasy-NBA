@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import Image from 'next/image';
+import Link from "next/link";
+import Image from "next/image";
 
 export default function HomePage() {
   return (
@@ -11,46 +11,78 @@ export default function HomePage() {
       <div className="flex gap-8 justify-center w-full">
         <Link
           href="/position/guards"
+          className="relative group overflow-hidden rounded-3xl cursor-default"
         >
           <Image
-              src='/poole.png'
-              alt='jordan poole photo'
-              width={300}
+              src="/poole-rs.png"
+              alt="jordan poole photo"
+              width={450}
               height={100}
+              className="transition-transform duration-300 group-hover:scale-105"
           />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0693e3]/10 to-[#0693e3] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          
+          <div className="absolute bottom-[15px] right-[15px] flex flex-col items-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <p className="text-black text-2xl font-bold">
+              Guards
+            </p>
+            <button className="bg-transparent border-2 border-black text-black px-6 py-2 rounded-lg font-semibold cursor-pointer 
+                              hover:bg-black hover:text-white">
+              View
+            </button>
+          </div>
         </Link>
+
+
         <Link
-          href="/position/forwards"
+          href="/position/guards"
+          className="relative group overflow-hidden rounded-3xl cursor-default"
         >
-          Forwards
+          <Image
+              src="/lebron-rs1.png"
+              alt="lebron james photo"
+              width={450}
+              height={100}
+              className="transition-transform duration-300 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0693e3]/10 to-[#0693e3] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          
+          <div className="absolute bottom-[15px] right-[15px] flex flex-col items-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <p className="text-black text-2xl font-bold">
+              Forwards
+            </p>
+            <button className="bg-transparent border-2 border-black text-black px-6 py-2 rounded-lg font-semibold cursor-pointer 
+                              hover:bg-black hover:text-white">
+              View
+            </button>
+          </div>
         </Link>
-        <Link 
-          href="/position/centers"
-          className="bg-white text-[#0693e3] px-4 py-2 rounded-md font-semibold flex justify-center items-center"
+
+
+        <Link
+          href="/position/guards"
+          className="relative group overflow-hidden rounded-3xl cursor-default"
         >
-          Centers
+          <Image
+              src="/jokic-rs.png"
+              alt="nikola jokic photo"
+              width={450}
+              height={100}
+              className="transition-transform duration-300 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0693e3]/10 to-[#0693e3] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          
+          <div className="absolute bottom-[15px] right-[15px] flex flex-col items-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <p className="text-black text-2xl font-bold">
+              Centers
+            </p>
+            <button className="bg-transparent border-2 border-black text-black px-6 py-2 rounded-lg font-semibold cursor-pointer 
+                              hover:bg-black hover:text-white">
+              View
+            </button>
+          </div>
         </Link>
       </div>
-
-      <div className="relative group w-48 h-64 overflow-hidden rounded-xl shadow-lg transition-all duration-300 hover:shadow-red-700/50 mt-20">
-          <Link href="/position/forwards" className="block w-full h-full">
-            <div className="absolute inset-0 bg-blue-700/0 group-hover:bg-blue-700/50 transition-all duration-300 z-10 flex flex-col justify-end p-2">
-              <span className="text-xl font-bold mb-4 text-white text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                FORWARDS
-              </span>
-              <button className="bg-white text-black font-bold py-1 px-3 rounded-full text-sm self-end opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                View
-              </button>
-            </div>
-            {/* Placeholder Image (Replace with a Forward photo) */}
-            <Image
-              src='/lebron.png'
-              alt='lebron james photo'
-              width={300}
-              height={100}
-            />
-          </Link>
-        </div>
     </main>
   );
 }     

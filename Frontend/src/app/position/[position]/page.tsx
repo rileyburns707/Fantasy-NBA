@@ -28,7 +28,7 @@ export default function PositionPage() {
   const [hasMorePages, setHasMorePages] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const PAGE_SIZE = 15
+  const PAGE_SIZE = 13
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalDetails, setModalDetails] = useState<PlayerStats | null>(null);
@@ -139,95 +139,97 @@ export default function PositionPage() {
 
   return (
     <main className="flex flex-col items-center min-h-screen bg-[#0693e3] text-white p-6">
-      {/* Top-left position title */}
-      <div className="mb-4 w-full max-w-4xl flex items-center justify-between">
-        <h1 className="text-3xl font-bold">{positionParam.replace('-', ' ').toUpperCase()}</h1>
+      <div className="w-full max-w-4xl bg-[#181818] p-8 rounded shadow-2xl">
+        {/* Position page title */}
+        <div className="mb-4 w-full max-w-4xl flex items-center justify-between">
+          <h1 className="text-3xl font-bold">{positionParam.replace('-', ' ').toUpperCase()}</h1>
 
-        {/* Page indicator */}
-        <div className="text-sm">Page {page}</div>
-      </div>
+          {/* Page indicator */}
+          <div className="text-sm">Page {page}</div>
+        </div>
 
-      {/* Search input */}
-      <div className="w-full max-w-4xl mb-6 border border-white rounded-lg">
-        <input
-          type="text"
-          placeholder="Search players in this position (e.g., LeBron James)"
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value)
-            setPage(1)
-          }}
-          className="w-full p-3 rounded-md text-black"
+        {/* Search bar */}
+        <div className="w-full max-w-4xl mb-6 border border-white rounded-lg">
+          <input
+            type="text"
+            placeholder="Search players in this position (e.g., LeBron James)..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              setPage(1)
+            }}
+            className="w-full p-3 rounded-md text-white"
+          />
+        </div>
+
+        {/* Error / Loading */}
+        <div className="w-full max-w-4xl">
+          {error && <p className="mb-4 text-red-200">Error: {error}</p>}
+          {isLoading && <p className="mb-4 text-white/90">Loading players...</p>}
+        </div>
+
+        {/* Table */}
+        <div className="w-full max-w-4xl overflow-x-auto">
+          <table className="min-w-full bg-white text-[#0693e3] rounded-lg overflow-hidden">
+            <thead>
+              <tr className="bg-[#0580c3] text-white">
+                <th className="py-3 px-8 text-left">Player Name</th>
+                <th className="py-3 px-4 text-left">Team</th>
+                <th className="py-3 px-4 text-left">Position</th>
+              </tr>
+            </thead>
+            <tbody>
+              {players.length > 0 ? (
+                players.map(player => (
+                  <tr
+                    key={player.id}
+                    className="border-b border-gray-200 hover:bg-[#e6f7ff] cursor-pointer"
+                    onClick={() => {
+                      fetchAndOpenModal(player);
+                    }}
+                  >
+                    <td className="py-2 px-4 text-black">{player.full_name}</td>
+                    <td className="py-2 px-4 text-black">{player.team_id?.name ?? 'N/A'}</td>
+                    <td className="py-2 px-4 text-black">{player.position}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={3} className="py-4 text-center text-black">
+                    {isLoading ? 'Loading...' : 'No players found on this page'}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination controls */}
+        <div className="flex gap-4 mt-6">
+          <button
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+            className="bg-white text-[#0693e3] px-4 py-2 rounded-md font-semibold disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <button
+            onClick={() => setPage(p => p + 1)}
+            disabled={!hasMorePages}
+            className="bg-white text-[#0693e3] px-4 py-2 rounded-md font-semibold disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+
+        {/* Player stats modal */}
+        <PlayerStatsModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          details={modalDetails}
+          isLoading={isModalLoading}
         />
       </div>
-
-      {/* Error / Loading */}
-      <div className="w-full max-w-4xl">
-        {error && <p className="mb-4 text-red-200">Error: {error}</p>}
-        {isLoading && <p className="mb-4 text-white/90">Loading players...</p>}
-      </div>
-
-      {/* Table */}
-      <div className="w-full max-w-4xl overflow-x-auto">
-        <table className="min-w-full bg-white text-[#0693e3] rounded-lg overflow-hidden">
-          <thead>
-            <tr className="bg-[#0580c3] text-white">
-              <th className="py-3 px-8 text-left">Player Name</th>
-              <th className="py-3 px-4 text-left">Team</th>
-              <th className="py-3 px-4 text-left">Position</th>
-            </tr>
-          </thead>
-          <tbody>
-            {players.length > 0 ? (
-              players.map(player => (
-                <tr
-                  key={player.id}
-                  className="border-b border-gray-200 hover:bg-[#e6f7ff] cursor-pointer"
-                  onClick={() => {
-                    fetchAndOpenModal(player);
-                  }}
-                >
-                  <td className="py-2 px-4 text-black">{player.full_name}</td>
-                  <td className="py-2 px-4 text-black">{player.team_id?.name ?? 'N/A'}</td>
-                  <td className="py-2 px-4 text-black">{player.position}</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={3} className="py-4 text-center text-black">
-                  {isLoading ? 'Loading...' : 'No players found on this page'}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination controls */}
-      <div className="flex gap-4 mt-6">
-        <button
-          onClick={() => setPage(p => Math.max(1, p - 1))}
-          disabled={page === 1}
-          className="bg-white text-[#0693e3] px-4 py-2 rounded-md font-semibold disabled:opacity-50"
-        >
-          Previous
-        </button>
-        <button
-          onClick={() => setPage(p => p + 1)}
-          disabled={!hasMorePages}
-          className="bg-white text-[#0693e3] px-4 py-2 rounded-md font-semibold disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>
-
-      {/* Player stats modal */}
-      <PlayerStatsModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        details={modalDetails}
-        isLoading={isModalLoading}
-      />
     </main>
   );
 }

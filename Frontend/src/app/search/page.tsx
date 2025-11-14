@@ -1,6 +1,6 @@
 'use client';   
 
-import { useState } from 'react'; 
+import { useEffect, useState } from 'react'; 
 import { supabase } from '@/lib/supabaseClient'; 
 import PlayerStatsModal, {PlayerStats} from '@/components/PlayerStatsModal';
 
@@ -14,15 +14,24 @@ interface Player {
 export default function SearchPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState<Player[]>([]);
+    const [page, setPage] = useState(1);
+    const [hasMorePages, setHasMorePages] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const PAGE_SIZE = 13
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalDetails, setModalDetails]= useState<PlayerStats | null>(null);
     const [isModalLoading, setIsModalLoading] = useState(false);
 
-    const searchPlayers = async (e: React.FormEvent) => {
-      e.preventDefault();
+    useEffect(() => {
+      // Only auto-search if there's already a search term 
+      if (searchTerm.trim().length >= 2) {
+        performSearch();
+      }
+    }, [page]);
+
+    const performSearch = async () => {
       const queryTerm = searchTerm.trim();
       
       if (queryTerm.length < 2) {
@@ -33,22 +42,31 @@ export default function SearchPage() {
 
       setIsLoading(true);
       setError(null);
-      setSearchResults([]);
+      // setSearchResults([]);
+
+      // pagination
+      const from = (page - 1) * PAGE_SIZE;
+      const to = page * PAGE_SIZE - 1;
 
       try {
-        const { data, error } = await supabase
-        .from('players')
-        .select('id, full_name, position, team_id!inner(name)')
-        .ilike('full_name', `%${queryTerm}%`)
-        .limit(5);
+        let query = supabase
+          .from('players')
+          .select('id, full_name, position, team_id!inner(name)')
+          .ilike('full_name', `%${queryTerm}%`)
+          .limit(PAGE_SIZE);
+        
+        const { data, error: dbError } = await query.range(from, to);
 
-        if (error) {
-          console.error('Supabase search error: ', error);
-          setError(`Failed to fetch players. Error: ${error.message}`);
+        if (dbError) {
+          console.error('Supabase search error: ', dbError);
+          setError(`Failed to fetch players. Error: ${dbError.message}`);
           return;
         }
 
         if (data) {
+          const isLastPage = data.length < PAGE_SIZE; 
+          setHasMorePages(!isLastPage);
+          
           const inputData = (data as any[]).map(item => ({
             id: item.id,
             full_name: item.full_name,
@@ -58,6 +76,7 @@ export default function SearchPage() {
           setSearchResults(inputData);
         } else {
           setSearchResults([]);
+          setHasMorePages(false);
         }
     
       } catch (err) {
@@ -66,6 +85,13 @@ export default function SearchPage() {
       } finally {
         setIsLoading(false);
       }
+    };
+
+    // Update your form submit handler
+    const searchPlayers = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setPage(1); // Reset to page 1 on new search
+      await performSearch();
     };
 
     const fetchAndOpenModal = async (player: Player) => {
@@ -115,11 +141,12 @@ export default function SearchPage() {
     };
 
 return (
-   <main className="flex flex-col items-center justify-start min-h-screen bg-black text-white p-6">
+   <main className="flex flex-col items-center justify-start min-h-screen bg-[#0693e3] text-white p-6">
     <div className="w-full max-w-4xl bg-[#181818] p-8 rounded shadow-2xl">
-      {/* Header Search Message*/}
+      {/* Search page title */}
       <div className="mb-4 w-full max-w-4xl flex items-center justify-between">
         <h1 className="text-3xl font-bold">Player Search</h1>
+        {searchResults.length > 0 && <div className="text-sm">Page {page}</div>}
       </div>
 
       {/* Search bar*/}
@@ -129,7 +156,9 @@ return (
             type="text"
             placeholder="Search players (e.g., Lebron James)..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value); setPage(1);
+            }}
             className="w-full p-3 focus:outline-none text-white"
           />
           <button
@@ -182,6 +211,24 @@ return (
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Pagination controls */}
+        <div className="flex gap-4 mt-6">
+          <button
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+            className="bg-white text-[#0693e3] px-4 py-2 rounded-md font-semibold disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <button
+            onClick={() => setPage(p => p + 1)}
+            disabled={!hasMorePages}
+            className="bg-white text-[#0693e3] px-4 py-2 rounded-md font-semibold disabled:opacity-50"
+          >
+            Next
+          </button>
         </div>
 
         {/* Player stats modal */}
