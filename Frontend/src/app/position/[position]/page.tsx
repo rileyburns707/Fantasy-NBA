@@ -142,7 +142,7 @@ export default function PositionPage() {
       <div className="w-full max-w-4xl bg-[#181818] p-8 rounded shadow-2xl">
         {/* Position page title */}
         <div className="mb-4 w-full max-w-4xl flex items-center justify-between">
-          <h1 className="text-3xl font-bold">{positionParam.replace('-', ' ').toUpperCase()}</h1>
+          <h1 className="text-3xl font-bold">{positionParam.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase())}</h1>
 
           {/* Page indicator */}
           <div className="text-sm">Page {page}</div>

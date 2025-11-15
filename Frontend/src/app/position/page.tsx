@@ -5,8 +5,8 @@ import Image from "next/image";
 
 export default function HomePage() {
   return (
-    <main className="flex flex-col items-center justify-start min-h-screen bg-black text-white p-20">
-      <h1 className="text-5xl font-extrabold ml-30 mb-15 self-start">Select a position</h1>
+    <main className="flex flex-col items-center justify-start min-h-screen bg-black text-white pt-30 px-20">
+      <h1 className="justify-center text-5xl font-extrabold mb-15">Select a position</h1>
 
       <div className="flex gap-8 justify-center w-full">
         <Link
@@ -33,9 +33,8 @@ export default function HomePage() {
           </div>
         </Link>
 
-
         <Link
-          href="/position/guards"
+          href="/position/forwards"
           className="relative group overflow-hidden rounded-3xl cursor-default"
         >
           <Image
@@ -43,8 +42,17 @@ export default function HomePage() {
               alt="lebron james photo"
               width={450}
               height={100}
-              className="transition-transform duration-300 group-hover:scale-105"
+              className="transition-opacity duration-300 group-hover:opacity-0"
           />
+
+          <Image
+              src="/lebron-king.png"
+              alt="lebron james king photo"
+              width={450}
+              height={100}
+              className="absolute top-0 left-0 transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+            />
+
           <div className="absolute inset-0 bg-gradient-to-b from-[#0693e3]/10 to-[#0693e3] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           
           <div className="absolute bottom-[15px] right-[15px] flex flex-col items-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -58,9 +66,8 @@ export default function HomePage() {
           </div>
         </Link>
 
-
         <Link
-          href="/position/guards"
+          href="/position/centers"
           className="relative group overflow-hidden rounded-3xl cursor-default"
         >
           <Image

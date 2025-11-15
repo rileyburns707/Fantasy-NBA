@@ -217,14 +217,14 @@ return (
         <div className="flex gap-4 mt-6">
           <button
             onClick={() => setPage(p => Math.max(1, p - 1))}
-            disabled={page === 1}
+            disabled={page === 1 || !searchTerm.trim()}
             className="bg-white text-[#0693e3] px-4 py-2 rounded-md font-semibold disabled:opacity-50"
           >
             Previous
           </button>
           <button
             onClick={() => setPage(p => p + 1)}
-            disabled={!hasMorePages}
+            disabled={!hasMorePages || !searchTerm.trim()}
             className="bg-white text-[#0693e3] px-4 py-2 rounded-md font-semibold disabled:opacity-50"
           >
             Next
