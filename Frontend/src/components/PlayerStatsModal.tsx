@@ -1,4 +1,5 @@
 import React from 'react'
+import * as NBAIcons from 'react-nba-logos';  // SVG files for team logos
 
 export interface PlayerStats {
   // header details
@@ -22,13 +23,13 @@ export interface PlayerStats {
   plus_minus: number;
 }
 
-const StatItem = ({label, value}: {label: string, value: number | string | undefined }) => (
+const StatItem = ({label, value, isPercentage = false}: {label: string, value: number | string | undefined, isPercentage?: boolean }) => (
   <div className="bg-gray-50 p-3 rounded-xl shadow-sm border border-gray-100">
     <div className="text-xs font-medium text-gray-500 uppercase tracking-wider">{label}</div>
     {/* Handle percentages and general numbers */}
     <div className="text-xl md:text-2xl font-extrabold text-gray-900 mt-1">
       {typeof value === 'number' 
-        ? (Math.abs(value) < 1 ? (value * 100).toFixed(1) + '%' : value.toFixed(1))
+        ? (isPercentage ? (value * 100).toFixed(1) + '%' : value.toFixed(1))
         : (value ?? 'N/A')}
     </div>
   </div>
@@ -42,22 +43,33 @@ export default function PlayerStatsModal({isOpen, onClose, details, isLoading} :
 }) {
   if (!isOpen) return null;
 
+  // Per-game averages
+  const getPerGameAvg = (total: number) => {
+    if (!details || details.games_played === 0) return 0;
+    return total / details.games_played;
+  };
+
+  const TeamLogo = details?.team_name ? (NBAIcons as any)[details.team_name] : null;
+
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4 transition-opacity"
+      className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4 transition-opacity"
       onClick={onClose}
     >
       <div
-        className="bg-white text-gray-800 rounded-2xl shadow-2xl w-full max-w-lg transform scale-100 overflow-y-auto max-h-[90vh]"
+        className="bg-gray-200 text-gray-800 rounded-2xl shadow-2xl w-full max-w-lg transform scale-100 overflow-y-auto max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-6 md:p-8">
           
-          {/* Header (Player Name and Close Button) */}
+          {/* Header */}
           <div className="flex justify-between items-start border-b pb-3 mb-4">
-            <h2 className="text-3xl font-extrabold text-[#0693e3]">
-              {isLoading ? 'Loading Stats...' : details?.full_name || 'Player Details'}
-            </h2>
+            <div className="flex items-center gap-3">
+              <h2 className="text-3xl font-extrabold text-[#0693e3]">
+                {isLoading ? 'Loading Stats...' : details?.full_name || 'Player Details'}
+              </h2>
+              {TeamLogo && <TeamLogo size={50} />}
+            </div>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-700 transition transform hover:rotate-90"
@@ -80,34 +92,39 @@ export default function PlayerStatsModal({isOpen, onClose, details, isLoading} :
               <div className="space-y-6">
                 
                 {/* Secondary Header Details */}
-                <div className="flex justify-around text-base md:text-lg font-semibold border-b pb-2">
-                  <p><span className="text-[#0580c3] mr-1">Team:</span> {details.team_name}</p>
-                  <p><span className="text-[#0580c3] mr-1">Pos:</span> {details.position}</p>
-                  <p><span className="text-[#0580c3] mr-1">GP:</span> {details.games_played}</p>
+                <div className="flex justify-around text-base md:text-lg font-bold border-b pb-2">
+                  <p><span className="text-[#0693e3] mr-1">Team:</span> {details.team_name}</p>  
+                  <p><span className="text-[#0693e3] mr-1">Pos:</span> {details.position}</p>
+                  <p><span className="text-[#0693e3] mr-1">GP:</span> {details.games_played}</p>
                 </div>
                 
-                <h3 className="text-xl font-bold text-[#0580c3]">Key Statistics</h3>
+                <h3 className="text-2xl font-extrabold text-[#0693e3]">Per-Game Statistics</h3>
                 
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  <StatItem label="Points" value={details.points} />
-                  <StatItem label="Assists" value={details.assists} />
-                  <StatItem label="Rebounds" value={details.total_rebounds} />
-                  <StatItem label="Steals" value={details.steals} />
-                  <StatItem label="Blocks" value={details.blocks} />
-                  <StatItem label="Turnovers" value={details.turnovers} />
-                  <StatItem label="Fantasy Pts" value={details.fantasy_points_standard} />
-                  <StatItem label="Minutes" value={details.total_minutes} />
-                  <StatItem label="+/-" value={details.plus_minus} />
+                  <StatItem label="Points" value={getPerGameAvg(details.points)} />
+                  <StatItem label="Assists" value={getPerGameAvg(details.assists)} />
+                  <StatItem label="Rebounds" value={getPerGameAvg(details.total_rebounds)} />
+                  <StatItem label="Steals" value={getPerGameAvg(details.steals)} />
+                  <StatItem label="Blocks" value={getPerGameAvg(details.blocks)} />
+                  <StatItem label="Turnovers" value={getPerGameAvg(details.turnovers)} />
+                  <StatItem label="Minutes" value={getPerGameAvg(details.total_minutes)} />
+                  <StatItem label="+/-" value={getPerGameAvg(details.plus_minus)} />
                 </div>
                 
-                <h3 className="text-xl font-bold pt-2 text-[#0580c3]">Shooting Percentages</h3>
+                <h3 className="text-2xl font-extrabold text-[#0693e3]">Shooting Percentages</h3>
                 
                 <div className="grid grid-cols-3 gap-4">
-                  <StatItem label="FG%" value={details.field_goal_percentage} />
-                  <StatItem label="3PT%" value={details.three_point_percentage} />
-                  <StatItem label="FT%" value={details.free_throw_percentage} />
+                  <StatItem label="FG%" value={details.field_goal_percentage} isPercentage={true} />
+                  <StatItem label="3PT%" value={details.three_point_percentage} isPercentage={true} />
+                  <StatItem label="FT%" value={details.free_throw_percentage} isPercentage={true} />
                 </div>
 
+                <h3 className="text-2xl font-extrabold text-[#0693e3]">Fantasy Points</h3>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <StatItem label="Total Fantasy Pts" value={(details.fantasy_points_standard)} />
+                  <StatItem label="Fantasy Pts per game" value={getPerGameAvg((details.fantasy_points_standard))} />
+                </div>
               </div>
             ) : (
               <p className="text-red-500 font-medium p-3 bg-red-50 rounded-lg">
