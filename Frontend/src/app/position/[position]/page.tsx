@@ -101,7 +101,7 @@ export default function PositionPage() {
         .from('player_season_stats') 
         .select(`*, team_name:teams!inner(name)`)
         .eq('player_id', player.id)
-        .single(); // Expect a single row
+        .single(); 
 
       if (dbError) {
         console.error('Error fetching player stats:', dbError);

@@ -38,15 +38,25 @@ const DivisionGroup: React.FC<DivisionGroupProps> = ({ title, teams, delay = '0s
   </div>
 );
 
-
 export default function HomePage() {
   return (
     <main className="flex flex-col items-center justify-start min-h-screen bg-black text-white pt-3 px-10">
-      <h1 className="justify-center text-5xl font-extrabold mb-12">Select a team</h1>
+      <div className="relative flex items-center justify-center w-full mb-12">
+        <h1 className="text-5xl font-extrabold">Select a team</h1>
+        <Link
+          href="/teams/teamMap"
+          className="absolute right-0  text-white font-bold tracking-widest transition duration-150 p-2 
+                      border-2 border-white
+                      hover:text-black
+                      hover:bg-[#0693e3]
+                      hover:border-[#0693e3]"
+        >
+          Map View
+        </Link>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-20 gap-y-10 w-full max-w-7xl">
         
-        {/* Eastern conference */}
         <DivisionGroup 
           title="Atlantic Division" 
           delay="0s"
@@ -83,7 +93,6 @@ export default function HomePage() {
           ]}
         />
         
-        {/* Western conference */}
         <DivisionGroup 
           title="Northwest Division" 
           delay="0.3s"
@@ -117,7 +126,6 @@ export default function HomePage() {
             { name: 'San Antonio Spurs', href: '/teams/spurs', Logo: NBAIcons.SAS },
           ]}
         />
-
       </div>
     </main>
   );

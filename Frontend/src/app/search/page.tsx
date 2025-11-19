@@ -25,7 +25,6 @@ export default function SearchPage() {
     const [isModalLoading, setIsModalLoading] = useState(false);
 
     useEffect(() => {
-      // Only auto-search if there's already a search term 
       if (searchTerm.trim().length >= 2) {
         performSearch();
       }
@@ -87,10 +86,9 @@ export default function SearchPage() {
       }
     };
 
-    // Update your form submit handler
     const searchPlayers = async (e: React.FormEvent) => {
       e.preventDefault();
-      setPage(1); // Reset to page 1 on new search
+      setPage(1); 
       await performSearch();
     };
 

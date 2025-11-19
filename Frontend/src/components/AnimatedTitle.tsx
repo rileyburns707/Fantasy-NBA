@@ -94,8 +94,6 @@ const AnimatedLetter = ({ letter, index, onLetterHover }: AnimatedLetterProps) =
 };
 
 export default function AnimatedTitle({ onBackgroundChange }: AnimatedTitleProps) {
-  // const [backgroundImage, setBackgroundImage] = useState<string | null>(null);
-
   const animatedTitle = titleText.split('').map((letter, index) => (
       <AnimatedLetter key={index} letter={letter} index={index} onLetterHover={onBackgroundChange}/>
   ));
