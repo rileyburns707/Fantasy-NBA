@@ -6,9 +6,10 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
 const Links = [
-  {href:"/search", text:"Search"},
-  {href:"/position", text:"Position"},
   {href:"/teams", text:"Teams"},
+  {href:"/position", text:"Position"},
+  {href:"/search", text:"Search"},
+  
 ];
 
 const NavBar = () => {

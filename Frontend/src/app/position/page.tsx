@@ -11,7 +11,8 @@ export default function HomePage() {
       <div className="flex gap-8 justify-center w-full">
         <Link
           href="/position/guards"
-          className="relative group overflow-hidden rounded-3xl cursor-default"
+          className="relative group overflow-hidden rounded-3xl cursor-default animate-rise-up"
+          style={{ animationDelay: '0s' }}
         >
           <Image
               src="/poole-rs.png"
@@ -35,7 +36,8 @@ export default function HomePage() {
 
         <Link
           href="/position/forwards"
-          className="relative group overflow-hidden rounded-3xl cursor-default"
+          className="relative group overflow-hidden rounded-3xl cursor-default animate-rise-up"
+          style={{ animationDelay: '0.15s' }}
         >
           <Image
               src="/lebron-rs1.png"
@@ -68,7 +70,8 @@ export default function HomePage() {
 
         <Link
           href="/position/centers"
-          className="relative group overflow-hidden rounded-3xl cursor-default"
+          className="relative group overflow-hidden rounded-3xl cursor-default animate-rise-up"
+          style={{ animationDelay: '0.3s' }}
         >
           <Image
               src="/jokic-rs.png"

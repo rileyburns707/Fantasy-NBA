@@ -13,10 +13,14 @@ interface Team {
 interface DivisionGroupProps {
   title: string;
   teams: Team[]; 
+  delay?: string;
 }
 
-const DivisionGroup: React.FC<DivisionGroupProps> = ({ title, teams }) => (
-  <div className="flex flex-col gap-3">
+const DivisionGroup: React.FC<DivisionGroupProps> = ({ title, teams, delay = '0s' }) => (
+  <div 
+    className="flex flex-col gap-3 animate-rise-up"
+    style={{ animationDelay: delay }}
+  >
     <h2 className="text-2xl font-bold uppercase text-center mb-1">{title}</h2>
     
     <div className="flex flex-col gap-2"> 
@@ -45,6 +49,7 @@ export default function HomePage() {
         {/* Eastern conference */}
         <DivisionGroup 
           title="Atlantic Division" 
+          delay="0s"
           teams={[
             { name: 'Boston Celtics', href: '/teams/celtics', Logo: NBAIcons.BOS },
             { name: 'Brooklyn Nets', href: '/teams/nets', Logo: NBAIcons.BKN },
@@ -56,6 +61,7 @@ export default function HomePage() {
         
         <DivisionGroup 
           title="Central Division" 
+          delay="0.1s"
           teams={[
             { name: 'Chicago Bulls', href: '/teams/bulls', Logo: NBAIcons.CHI },
             { name: 'Cleveland Cavaliers', href: '/teams/cavaliers', Logo: NBAIcons.CLE },
@@ -67,6 +73,7 @@ export default function HomePage() {
         
         <DivisionGroup 
           title="Southeast Division" 
+          delay="0.2s"
           teams={[
             { name: 'Atlanta Hawks', href: '/teams/hawks', Logo: NBAIcons.ATL },
             { name: 'Charlotte Hornets', href: '/teams/hornets', Logo: NBAIcons.CHA },
@@ -79,6 +86,7 @@ export default function HomePage() {
         {/* Western conference */}
         <DivisionGroup 
           title="Northwest Division" 
+          delay="0.3s"
           teams={[
             { name: 'Denver Nuggets', href: '/teams/nuggets', Logo: NBAIcons.DEN },
             { name: 'Minnesota Timberwolves', href: '/teams/timberwolves', Logo: NBAIcons.MIN },
@@ -89,6 +97,7 @@ export default function HomePage() {
         />
         <DivisionGroup 
           title="Pacific Division"
+          delay="0.4s"
           teams={[
             { name: 'Golden State Warriors', href: '/teams/warriors', Logo: NBAIcons.GSW },
             { name: 'LA Clippers', href: '/teams/clippers', Logo: NBAIcons.LAC },
@@ -99,6 +108,7 @@ export default function HomePage() {
         />
         <DivisionGroup
         title="Southwest Division"
+        delay="0.5s"
         teams={[
             { name: 'Dallas Mavericks', href: '/teams/mavericks', Logo: NBAIcons.DAL },
             { name: 'Houston Rockets', href: '/teams/rockets', Logo: NBAIcons.HOU },
