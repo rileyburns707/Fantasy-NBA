@@ -25,5 +25,11 @@
     "eslint-config-next": "15.5.3",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "overrides": {
+    "react-nba-logos": {
+      "react": "$react",
+      "react-dom": "$react-dom"
+    }
   }
 }

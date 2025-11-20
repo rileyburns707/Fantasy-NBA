@@ -1,24 +1,20 @@
 import pandas as pd
 import psycopg2
 import os
-from dotenv import load_dotenv # Import load_dotenv
+from dotenv import load_dotenv 
 
-# Load environment variables from .env file
 load_dotenv()
 
-# Get database credentials from environment variables
 SUPABASE_HOST = os.getenv("SUPABASE_HOST")
 SUPABASE_PORT = os.getenv("SUPABASE_PORT")
 SUPABASE_DBNAME = os.getenv("SUPABASE_DBNAME")
 SUPABASE_USER = os.getenv("SUPABASE_USER")
 SUPABASE_PASSWORD = os.getenv("SUPABASE_PASSWORD")
 
-# Add a check to ensure essential variables are loaded
 if not all([SUPABASE_HOST, SUPABASE_PORT, SUPABASE_DBNAME, SUPABASE_USER, SUPABASE_PASSWORD]):
     raise ValueError("One or more Supabase environment variables are not set. Please ensure your .env file is correctly configured")
 
-# Database connection
-conn = None # Initialize conn to None for finally block safety
+conn = None 
 try:
     conn = psycopg2.connect(
         host=SUPABASE_HOST,
@@ -30,38 +26,30 @@ try:
     conn.autocommit = True
     cur = conn.cursor()
 
-    # Read CSV
     df = pd.read_csv('nba_fantasy_stats_with_positions.csv')
 
-    # Get current season ID (assuming 2024-25 season exists)
     cur.execute("SELECT id FROM seasons WHERE season_year = '2024-25'")
     season_id_result = cur.fetchone()
     if season_id_result:
         season_id = season_id_result[0]
     else:
-        # Handle case where season doesn't exist. You could insert it:
         print("Season '2024-25' not historical seasons. Inserting it now...")
-        # Make sure these dates are appropriate for a new season entry
         cur.execute("INSERT INTO seasons (season_year, start_date, end_date, is_current) VALUES (%s, %s, %s, %s) RETURNING id",
-                    ('2024-25', '2024-10-01', '2025-06-30', True)) # Adjust dates as necessary
+                    ('2024-25', '2024-10-01', '2025-06-30', True)) 
         season_id = cur.fetchone()[0]
-        conn.commit() # Commit the new season insertion
+        conn.commit() 
         print(f"Inserted season 2024-25 with ID: {season_id}")
 
 
     print(f"Processing {len(df)} players...")
 
-    # Process each row
     for index, row in df.iterrows():
-        # 1. Insert team (check if exists first)
         team_abbr = row['TEAM_ABBREVIATION']
         
-        # Check if team already exists
         cur.execute("SELECT id FROM teams WHERE name = %s", (team_abbr,))
         team_result = cur.fetchone()
         
         if team_result is None:
-            # Team doesn't exist, insert it
             cur.execute("""
                 INSERT INTO teams (name) 
                 VALUES (%s)
@@ -71,12 +59,10 @@ try:
         else:
             team_id = team_result[0]
         
-        # 2. Insert player (update if already exists)
         player_nba_id = int(row['PLAYER_ID'])
         player_name = row['PLAYER_NAME']
         position = row['POSITION'] if pd.notna(row['POSITION']) else 'UNKNOWN'
         
-        # Split name into first and last name
         name_parts = player_name.split(' ', 1)
         first_name = name_parts[0] if len(name_parts) > 0 else 'Unknown'
         last_name = name_parts[1] if len(name_parts) > 1 else 'Unknown'
@@ -93,10 +79,8 @@ try:
             RETURNING id; -- Use RETURNING id to get the player's internal ID directly
         """, (player_nba_id, first_name, last_name, player_name, position, team_id))
         
-        # Get player internal ID directly from the INSERT/UPDATE statement
         player_id = cur.fetchone()[0]
         
-        # 3. Insert player stats with data validation
         def clean_numeric(value, allow_negative=False):
             if pd.isna(value) or value is None:
                 return 0.0
@@ -172,20 +156,20 @@ try:
             print(f"Processed {index} players...")
 
     print("Data loading loop completed.")
-    conn.commit() # Ensure a final commit for any remaining uncommitted transactions
+    conn.commit() 
     print("Final commit successful.")
 
 except Exception as e:
    print(f"Error connecting to Supabase or loading data: {e}")
-   if conn: # Check if conn was successfully established before trying to rollback
-       conn.rollback() # Rollback on error
+   if conn: 
+       conn.rollback() 
        print("Transaction rolled back due to error.")
 
 finally:
-   if conn: # Check if conn exists and is not None
-       if not cur.closed: # Check if cursor is not already closed
+   if conn: 
+       if not cur.closed: 
            cur.close()
-       if not conn.closed: # Check if connection is not already closed
+       if not conn.closed: 
            conn.close()
        print("Database connection closed.")
-   print("✅ Done! Data import process finished.")
+   print("Done! Data import process finished.")
