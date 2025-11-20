@@ -144,9 +144,6 @@ export default function mapPage() {
             );
           })}
         </div>
-      <div>
-        test
-      </div>
     </main>
   );
 }
